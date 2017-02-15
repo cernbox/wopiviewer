@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<info>
+    <id>wopiviewer</id>
+    <name>Wopi Viewer</name>
+    <description>WOPI Viewer</description>
+    <licence>AGPL</licence>
+    <author>Hugo Gonzalez Labrador (CERN)</author>
+    <version>0.0.1</version>
+    <namespace>WopiViewer</namespace>
+    <category>other</category>
+    <dependencies>
+        <owncloud min-version="8.2.2" />
+    </dependencies>
+</info>

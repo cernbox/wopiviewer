@@ -1,0 +1,30 @@
+/*
+#office_frame {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: 0;
+	border: none;
+	display: block;
+	z-index: 10000;
+}
+*/
+
+#office_container #office_frame {
+	position: absolute;
+	display: block;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	z-index: 150;
+}
+
+#office_container #office-close-button {
+}
