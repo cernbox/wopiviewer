@@ -24,11 +24,14 @@ class PageController extends Controller {
 
 
 	private $userId;
-	private $wopiBaseUrl = 'http://wopiserver-test:8080';
+	private $wopiBaseUrl;
+	private $wopiSecret;
 
 	public function __construct($AppName, IRequest $request, $UserId) {
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;
+		$this->wopiSecret = \OC::$server->getConfig()->getSystemValue("wopi.secret", "http://wopiserver-test:8080");
+		$this->wopiBaseUrl = \OC::$server->getConfig()->getSystemValue("wopi.baseurl", "please change me");
 	}
 
 	/**
@@ -68,7 +71,7 @@ class PageController extends Controller {
 		if ($node->isReadable()) {
 			$client = new Client();
 			$request = $client->createRequest("GET", sprintf("%s/cbox/open", $this->wopiBaseUrl));
-			$request->addHeader("Authorization",  "Bearer cernboxsecret");
+			$request->addHeader("Authorization",  "Bearer " . $this->wopiSecret);
 			$request->getQuery()->add("ruid", $uid);
 			$request->getQuery()->add("rgid", $gid);
 			$request->getQuery()->add("filename", $eosPath);
