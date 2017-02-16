@@ -51,7 +51,7 @@ class PageController extends Controller {
 	 *
 	 * @NoAdminRequired
 	 */
-	public function doOpen($filename, $canEdit) {
+	public function doOpen($filename, $canedit) {
 		$username = \OC::$server->getUserSession()->getLoginName();
 		$uidAndGid = EosUtil::getUidAndGid($username);
 		if($uidAndGid === null) {
@@ -72,7 +72,62 @@ class PageController extends Controller {
 			$request->getQuery()->add("ruid", $uid);
 			$request->getQuery()->add("rgid", $gid);
 			$request->getQuery()->add("filename", $eosPath);
-			$request->getQuery()->add("canedit", "no");
+			$request->getQuery()->add("canedit", $canedit);
+
+			$response = $client->send($request);
+			if ($response->getStatusCode() == 200) {
+				$body = $response->getBody(true);
+				$body = urldecode($body);
+				return new DataResponse(['wopi_src' => $body]);
+			} else {
+				return new DataResponse(['error' => 'error opening file in wopi server']);
+			}
+		}
+	}
+
+	/**
+	 * Simply method that posts back the payload of the request
+	 *
+	 * @PublicPage
+	 */
+	public function doPublicOpen($filename, $canedit, $token) {
+		$filename = trim($filename, "/");
+		$token = trim($token);
+		if(!$token) {
+			return new DataResponse(['error' => 'invalid token']);
+		}
+
+		$query = \OC_DB::prepare('SELECT * FROM oc_share WHERE  share_type = 3 AND token = ?');
+		$result = $query->execute([$token]);
+
+		$row = $result->fetchRow();
+		if(!$row) {
+			return new DataResponse(['error' => 'invalid token']);
+		}
+
+		$owner = $row['uid_owner'];
+		$fileID = $row['item_source'];
+		$uidAndGid = EosUtil::getUidAndGid($owner);
+		if($uidAndGid === null) {
+			return new DataResponse(['error' => 'username does not have a valid uid and gid']);
+		}
+		list($uid, $gid) = $uidAndGid;
+		if(!$uid || !$gid) {
+			return new DataResponse(['error' => 'username does not have a valid uid and gid']);
+		}
+
+		$node = \OC::$server->getUserFolder($owner)->getById($fileID)[0];
+		$filename = $node->getInternalPath() . "/" . $filename;
+		$info = $node->getStorage()->stat($filename);
+		$eosPath = $info['eospath'];
+		if ($node->isReadable()) {
+			$client = new Client();
+			$request = $client->createRequest("GET", sprintf("%s/cbox/open", $this->wopiBaseUrl));
+			$request->addHeader("Authorization",  "Bearer cernboxsecret");
+			$request->getQuery()->add("ruid", $uid);
+			$request->getQuery()->add("rgid", $gid);
+			$request->getQuery()->add("filename", $eosPath);
+			$request->getQuery()->add("canedit", $canedit);
 
 			$response = $client->send($request);
 			if ($response->getStatusCode() == 200) {
