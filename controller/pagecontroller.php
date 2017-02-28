@@ -54,7 +54,7 @@ class PageController extends Controller {
 	 *
 	 * @NoAdminRequired
 	 */
-	public function doOpen($filename, $canedit) {
+	public function doOpen($filename) {
 		$username = \OC::$server->getUserSession()->getLoginName();
 		$uidAndGid = EosUtil::getUidAndGid($username);
 		if($uidAndGid === null) {
@@ -68,7 +68,11 @@ class PageController extends Controller {
 		$node = \OC::$server->getUserFolder($username)->get($filename);
 		$info = $node->stat();
 		$eosPath = $info['eospath'];
+		$canedit = "false"; // we send boolean as strings to wopi
 		if ($node->isReadable()) {
+			if($node->isUpdateable()) {
+				$canedit = "true";
+			}
 			$client = new Client();
 			$request = $client->createRequest("GET", sprintf("%s/cbox/open", $this->wopiBaseUrl));
 			$request->addHeader("Authorization",  "Bearer " . $this->wopiSecret);
@@ -76,6 +80,12 @@ class PageController extends Controller {
 			$request->getQuery()->add("rgid", $gid);
 			$request->getQuery()->add("filename", $eosPath);
 			$request->getQuery()->add("canedit", $canedit);
+			$displayName = "Guest";
+			$user = \OC::$server->getUserSession()->getUser();
+			if($user) {
+				$displayName = $user->getDisplayName();
+			}
+			$request->getQuery()->add("username", $displayName);
 
 			$response = $client->send($request);
 			if ($response->getStatusCode() == 200) {

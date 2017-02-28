@@ -10,10 +10,19 @@
 
 (function ($, OC) {
 
+	var closeDocument = function (e) {
+		e.preventDefault();
+		$("#office_container").remove();
+		$("header div#header #office_close_button").remove();
+		window.location.hash = '';
+	};
+
+	$(window).bind('popstate', closeDocument);
+
+
 	var wordViewer = "https://oos.cern.ch/wv/wordviewerframe.aspx?WOPISrc=";
-	var wordEditor = "https://oos.cern.ch/wv/wordeditorframe.aspx?WOPISrc=";
-	var powerpointViewerAndEditor = "https://oos.cern.ch/p/PowerPointFrame.aspx?WOPISrc=";
-	var excelViewerAndEditor = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?WOPISrc=";
+	var powerpointViewer = "https://oos.cern.ch/p/PowerPointFrame.aspx?WOPISrc=";
+	var excelViewer = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?WOPISrc=";
 
 	var template = '<div id="office_container"><span id="frameholder"></span></div>';
 
@@ -34,14 +43,10 @@
 		office_frame.setAttribute('allowfullscreen', 'true');
 		office_frame.src = actionURL;
 		frameholder.appendChild(office_frame);
-		//document.getElementById('office_form').submit();
 
-		var closeButton = '<button id="office_close_button" style="position:absolute; right:0px; margin-top:4%">Close Office Document</button>';
+		var closeButton = '<button class="" id="office_close_button" style="display: block; position: absolute; right: 50%; top: 5px">Close Office</div>';
 		$("header div#header").append(closeButton);
-		$("header div#header #office_close_button").click(function () {
-			$("#office_container").remove();
-			$("header div#header #office_close_button").remove();
-		});
+		$("header div#header #office_close_button").click(closeDocument);
 	};
 
 
@@ -63,6 +68,11 @@
 	};
 
 	var sendOpen = function (filename, data, targetURL, canedit) {
+		var canedit = false;
+		var permissions = data.$file.attr("data-permissions");
+		if (permissions > 1) { // > 1 write permissions
+			canedit = true;
+		}
 		filename = data.dir + "/" + filename;
 
 		var data = {filename: filename, canedit: canedit};
@@ -78,6 +88,7 @@
 
 		$.post(url, data).success(function (response) {
 			if (response.wopi_src) {
+				window.location.hash = 'office';
 				var viewerURL = targetURL + encodeURI(response.wopi_src);
 				setView(viewerURL, response.wopi_src);
 			} else {
@@ -88,38 +99,28 @@
 
 	var wopiViewer = {
 		onViewWord: function (filename, data) {
-			sendOpen(filename, data, wordViewer, false);
-		},
-		onEditWord: function (filename, data) {
-			sendOpen(filename, data, wordEditor, true);
+			sendOpen(filename, data, wordViewer);
 		},
 		onViewPowerpoint: function (filename, data) {
-			sendOpen(filename, data, powerpointViewerAndEditor, false);
+			sendOpen(filename, data, powerpointViewer);
 		},
 		onViewExcel: function (filename, data) {
-			sendOpen(filename, data, excelViewerAndEditor, false);
+			sendOpen(filename, data, excelViewer);
 		},
-		onEditExcel: function (filename, data) {
-			sendOpen(filename, data, excelViewerAndEditor, true);
-		}
 	};
 
 
 	$(document).ready(function () {
-		try {
+		if (OCA && OCA.Files) {
 			OCA.Files.fileActions.register('application/msword', 'View in Office Online', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewWord);
-			OCA.Files.fileActions.register('application/msword', 'Edit in Office Online', OC.PERMISSION_READ, OC.imagePath('core', 'actions/edit'), wopiViewer.onEditWord);
 			OCA.Files.fileActions.register('application/vnd.ms-powerpoint', 'View in Office Online', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewPowerpoint);
 			OCA.Files.fileActions.register('application/vnd.ms-excel', 'View in Office Online', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewExcel);
-			OCA.Files.fileActions.register('application/vnd.ms-excel', 'Edit in Office Online', OC.PERMISSION_READ, OC.imagePath('core', 'actions/edit'), wopiViewer.onEditExcel);
 			OCA.Files.fileActions.register('application/msword', 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewWord);
 			OCA.Files.fileActions.register('application/vnd.ms-powerpoint', 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewPowerpoint);
 			OCA.Files.fileActions.register('application/vnd.ms-excel', 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewExcel);
 			OCA.Files.fileActions.setDefault('application/msword', 'Default View');
 			OCA.Files.fileActions.setDefault('application/vnd.ms-powerpoint', 'Default View');
 			OCA.Files.fileActions.setDefault('application/vnd.ms-excel', 'Default View');
-		} catch (e) {
-			console.log(e);
 		}
 	});
 
