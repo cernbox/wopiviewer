@@ -32,7 +32,7 @@
 
 	var template = '<div id="office_container"><span id="frameholder"></span></div>';
 
-	var setView = function (actionURL, accessToken) {
+	var setView = function (actionURL, accessToken, filename) {
 		var view = template.replace("<OFFICE_ONLINE_ACTION_URL", actionURL);
 		view = view.replace("<ACCESS_TOKEN_VALUE>", accessToken);
 
@@ -50,7 +50,7 @@
 		office_frame.src = actionURL;
 		frameholder.appendChild(office_frame);
 
-		var closeButton = '<button class="" id="office_close_button" style="display: block; position: absolute; right: 50%; top: 5px">Close Office</div>';
+		var closeButton = '<button class="" id="office_close_button" style="display: block; position: absolute; right: 50%; top: 5px">Close ' + filename +  '</div>';
 		$("header div#header").append(closeButton);
 		$("header div#header #office_close_button").click(closeDocument);
 	};
@@ -73,13 +73,13 @@
 		}
 	};
 
-	var sendOpen = function (filename, data, targetURL, canedit) {
+	var sendOpen = function (basename, data, targetURL, canedit) {
 		var canedit = false;
 		var permissions = data.$file.attr("data-permissions");
 		if (permissions > 1) { // > 1 write permissions
 			canedit = true;
 		}
-		filename = data.dir + "/" + filename;
+		filename = data.dir + "/" + basename;
 
 		var data = {filename: filename, canedit: canedit};
 		var url = "";
@@ -96,7 +96,7 @@
 			if (response.wopi_src) {
 				window.location.hash = 'office';
 				var viewerURL = targetURL + encodeURI(response.wopi_src);
-				setView(viewerURL, response.wopi_src);
+				setView(viewerURL, response.wopi_src, basename);
 			} else {
 				alert(response.error);
 			}
