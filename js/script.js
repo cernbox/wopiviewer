@@ -8,7 +8,10 @@
  * @copyright Hugo Gonzalez Labrador (CERN) 2017
  */
 
-(function ($, OC) {
+(function ($, OC, OCA) {
+	// just put WOPIViewer in global namespace so 
+	// the hack for owncloud 8 for having the new file menu entry can work.
+	OCA.WOPIViewer = {};
 
 	var closeDocument = function (e) {
 		e.preventDefault();
@@ -21,8 +24,11 @@
 
 
 	var wordViewer = "https://oos.cern.ch/wv/wordviewerframe.aspx?WOPISrc=";
+	var wordNew = "https://oos.cern.ch/we/wordeditorframe.aspx?new=1&WOPISrc=";
 	var powerpointViewer = "https://oos.cern.ch/p/PowerPointFrame.aspx?WOPISrc=";
+	var powerpointNew = "https://oos.cern.ch/p/PowerPointFrame.aspx?PowerPointView=EditView&New=1&WOPISrc=";
 	var excelViewer = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?WOPISrc=";
+	var excelNew = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?edit=1&new=1&WOPISrc=";
 
 	var template = '<div id="office_container"><span id="frameholder"></span></div>';
 
@@ -99,13 +105,34 @@
 
 	var wopiViewer = {
 		onViewWord: function (filename, data) {
-			sendOpen(filename, data, wordViewer);
+			// if file size is 0 we ask office online
+			// to create an empty docx file
+			var filesize = parseInt(data.$file.attr("data-size"));
+			if(filesize === 0) {
+				sendOpen(filename, data, wordNew);
+			} else {
+				sendOpen(filename, data, wordViewer);
+			}
 		},
 		onViewPowerpoint: function (filename, data) {
-			sendOpen(filename, data, powerpointViewer);
+			// if file size is 0 we ask office online
+			// to create an empty docx file
+			var filesize = parseInt(data.$file.attr("data-size"));
+			if(filesize === 0) {
+				sendOpen(filename, data, powerpointNew);
+			} else {
+				sendOpen(filename, data, powerpointViewer);
+			}
 		},
 		onViewExcel: function (filename, data) {
-			sendOpen(filename, data, excelViewer);
+			// if file size is 0 we ask office online
+			// to create an empty docx file
+			var filesize = parseInt(data.$file.attr("data-size"));
+			if(filesize === 0) {
+				sendOpen(filename, data, excelNew);
+			} else {
+				sendOpen(filename, data, excelViewer);
+			}
 		},
 	};
 
@@ -124,4 +151,4 @@
 		}
 	});
 
-})(jQuery, OC);
+})(jQuery, OC, OCA);
