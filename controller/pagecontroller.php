@@ -32,6 +32,7 @@ class PageController extends Controller {
 		$this->userId = $UserId;
 		$this->wopiSecret = \OC::$server->getConfig()->getSystemValue("wopi.secret", "http://wopiserver-test:8080");
 		$this->wopiBaseUrl = \OC::$server->getConfig()->getSystemValue("wopi.baseurl", "please change me");
+		$this->wopiCABundle = \OC::$server->getConfig()->getSystemValue("wopi.cabundle", true);
 	}
 
 	/**
@@ -58,8 +59,7 @@ class PageController extends Controller {
 		$username = \OC::$server->getUserSession()->getLoginName();
 		$uidAndGid = EosUtil::getUidAndGid($username);
 		if($uidAndGid === null) {
-			return new DataResponse(['error' => 'username does not have a valid uid and gid']);
-		}
+			return new DataResponse(['error' => 'username does not have a valid uid and gid']); }
 		list($uid, $gid) = $uidAndGid;
 		if(!$uid || !$gid) {
 			return new DataResponse(['error' => 'username does not have a valid uid and gid']);
@@ -74,7 +74,7 @@ class PageController extends Controller {
 				$canedit = "true";
 			}
 			$client = new Client();
-			$request = $client->createRequest("GET", sprintf("%s/cbox/open", $this->wopiBaseUrl));
+			$request = $client->createRequest("GET", sprintf("%s/cbox/open", $this->wopiBaseUrl), null, null, ['verify' => $this->wopiCABundle]);
 			$request->addHeader("Authorization",  "Bearer " . $this->wopiSecret);
 			$request->getQuery()->add("ruid", $uid);
 			$request->getQuery()->add("rgid", $gid);
@@ -135,7 +135,7 @@ class PageController extends Controller {
 		$eosPath = $info['eospath'];
 		if ($node->isReadable()) {
 			$client = new Client();
-			$request = $client->createRequest("GET", sprintf("%s/cbox/open", $this->wopiBaseUrl));
+			$request = $client->createRequest("GET", sprintf("%s/cbox/open", $this->wopiBaseUrl), null, null, $this->wopiCABundle);
 			$request->addHeader("Authorization",  "Bearer cernboxsecret");
 			$request->getQuery()->add("ruid", $uid);
 			$request->getQuery()->add("rgid", $gid);

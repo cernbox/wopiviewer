@@ -8,7 +8,10 @@
  * @copyright Hugo Gonzalez Labrador (CERN) 2017
  */
 
-(function ($, OC) {
+(function ($, OC, OCA) {
+	// just put WOPIViewer in global namespace so 
+	// the hack for owncloud 8 for having the new file menu entry can work.
+	OCA.WOPIViewer = {};
 
 	var closeDocument = function (e) {
 		e.preventDefault();
@@ -21,12 +24,15 @@
 
 
 	var wordViewer = "https://oos.cern.ch/wv/wordviewerframe.aspx?WOPISrc=";
+	var wordNew = "https://oos.cern.ch/we/wordeditorframe.aspx?new=1&WOPISrc=";
 	var powerpointViewer = "https://oos.cern.ch/p/PowerPointFrame.aspx?WOPISrc=";
+	var powerpointNew = "https://oos.cern.ch/p/PowerPointFrame.aspx?PowerPointView=EditView&New=1&WOPISrc=";
 	var excelViewer = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?WOPISrc=";
+	var excelNew = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?edit=1&new=1&WOPISrc=";
 
 	var template = '<div id="office_container"><span id="frameholder"></span></div>';
 
-	var setView = function (actionURL, accessToken) {
+	var setView = function (actionURL, accessToken, filename) {
 		var view = template.replace("<OFFICE_ONLINE_ACTION_URL", actionURL);
 		view = view.replace("<ACCESS_TOKEN_VALUE>", accessToken);
 
@@ -44,7 +50,7 @@
 		office_frame.src = actionURL;
 		frameholder.appendChild(office_frame);
 
-		var closeButton = '<button class="" id="office_close_button" style="display: block; position: absolute; right: 50%; top: 5px">Close Office</div>';
+		var closeButton = '<button class="" id="office_close_button" style="display: block; position: absolute; right: 50%; top: 5px">Close ' + filename +  '</div>';
 		$("header div#header").append(closeButton);
 		$("header div#header #office_close_button").click(closeDocument);
 		$(window).bind('popstate', closeDocument);
@@ -68,13 +74,13 @@
 		}
 	};
 
-	var sendOpen = function (filename, data, targetURL, canedit) {
+	var sendOpen = function (basename, data, targetURL, canedit) {
 		var canedit = false;
 		var permissions = data.$file.attr("data-permissions");
 		if (permissions > 1) { // > 1 write permissions
 			canedit = true;
 		}
-		filename = data.dir + "/" + filename;
+		filename = data.dir + "/" + basename;
 
 		var data = {filename: filename, canedit: canedit};
 		var url = "";
@@ -91,7 +97,7 @@
 			if (response.wopi_src) {
 				window.location.hash = 'office';
 				var viewerURL = targetURL + encodeURI(response.wopi_src);
-				setView(viewerURL, response.wopi_src);
+				setView(viewerURL, response.wopi_src, basename);
 			} else {
 				alert(response.error);
 			}
@@ -100,13 +106,34 @@
 
 	var wopiViewer = {
 		onViewWord: function (filename, data) {
-			sendOpen(filename, data, wordViewer);
+			// if file size is 0 we ask office online
+			// to create an empty docx file
+			var filesize = parseInt(data.$file.attr("data-size"));
+			if(filesize === 0) {
+				sendOpen(filename, data, wordNew);
+			} else {
+				sendOpen(filename, data, wordViewer);
+			}
 		},
 		onViewPowerpoint: function (filename, data) {
-			sendOpen(filename, data, powerpointViewer);
+			// if file size is 0 we ask office online
+			// to create an empty docx file
+			var filesize = parseInt(data.$file.attr("data-size"));
+			if(filesize === 0) {
+				sendOpen(filename, data, powerpointNew);
+			} else {
+				sendOpen(filename, data, powerpointViewer);
+			}
 		},
 		onViewExcel: function (filename, data) {
-			sendOpen(filename, data, excelViewer);
+			// if file size is 0 we ask office online
+			// to create an empty docx file
+			var filesize = parseInt(data.$file.attr("data-size"));
+			if(filesize === 0) {
+				sendOpen(filename, data, excelNew);
+			} else {
+				sendOpen(filename, data, excelViewer);
+			}
 		},
 	};
 
@@ -125,4 +152,4 @@
 		}
 	});
 
-})(jQuery, OC);
+})(jQuery, OC, OCA);
