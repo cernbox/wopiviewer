@@ -15,9 +15,9 @@
 		$("#office_container").remove();
 		$("header div#header #office_close_button").remove();
 		window.location.hash = '';
+		$(window).unbind('popstate', closeDocument);
 	};
 
-	$(window).bind('popstate', closeDocument);
 
 
 	var wordViewer = "https://oos.cern.ch/wv/wordviewerframe.aspx?WOPISrc=";
@@ -47,6 +47,7 @@
 		var closeButton = '<button class="" id="office_close_button" style="display: block; position: absolute; right: 50%; top: 5px">Close Office</div>';
 		$("header div#header").append(closeButton);
 		$("header div#header #office_close_button").click(closeDocument);
+		$(window).bind('popstate', closeDocument);
 	};
 
 
