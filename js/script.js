@@ -8,27 +8,33 @@
  * @copyright Hugo Gonzalez Labrador (CERN) 2017
  */
 
-(function ($, OC, OCA) {
+(function ($, OC, OCA) {	// just put WOPIViewer in global namespace so 
 	// just put WOPIViewer in global namespace so 
 	// the hack for owncloud 8 for having the new file menu entry can work.
 	OCA.WOPIViewer = {};
-
-	var closeDocument = function (e) {
-		e.preventDefault();
-		$("#office_container").remove();
-		$("header div#header #office_close_button").remove();
-		window.location.hash = '';
-	};
-
-	$(window).bind('popstate', closeDocument);
+/*
+ *
+ *         var wordViewer = "https://oos.cern.ch/wv/wordviewerframe.aspx?WOPISrc=";
+ *         -       var wordEditor = "https://oos.cern.ch/wv/wordeditorframe.aspx?WOPISrc=";
+ *         -       var powerpointViewerAndEditor = "https://oos.cern.ch/p/PowerPointFrame.aspx?WOPISrc=";
+ *         -       var excelViewerAndEditor = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?WOPISrc=";
+ *         +       var powerpointViewer = "https://oos.cern.ch/p/PowerPointFrame.aspx?WOPISrc=";
+ *         +       var excelViewer = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?WOPISrc=";
+ *
+ *
+ *
+ */
 
 
 	var wordViewer = "https://oos.cern.ch/wv/wordviewerframe.aspx?WOPISrc=";
 	var wordNew = "https://oos.cern.ch/we/wordeditorframe.aspx?new=1&WOPISrc=";
+	var wordEditor = "https://oos.cern.ch/we/wordeditorframe.aspx?WOPISrc=";
 	var powerpointViewer = "https://oos.cern.ch/p/PowerPointFrame.aspx?WOPISrc=";
+	var powerpointEditor = "https://oos.cern.ch/p/PowerPointFrame.aspx?PowerPointView=EditView&WOPISrc=";
 	var powerpointNew = "https://oos.cern.ch/p/PowerPointFrame.aspx?PowerPointView=EditView&New=1&WOPISrc=";
 	var excelViewer = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?WOPISrc=";
 	var excelNew = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?edit=1&new=1&WOPISrc=";
+	var excelEditor = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?edit=1&WOPISrc=";
 
 	var template = '<div id="office_container"><span id="frameholder"></span></div>';
 
@@ -49,10 +55,6 @@
 		office_frame.setAttribute('allowfullscreen', 'true');
 		office_frame.src = actionURL;
 		frameholder.appendChild(office_frame);
-
-		var closeButton = '<button class="" id="office_close_button" style="display: block; position: absolute; right: 50%; top: 5px">Close ' + filename +  '</div>';
-		$("header div#header").append(closeButton);
-		$("header div#header #office_close_button").click(closeDocument);
 	};
 
 
@@ -114,6 +116,16 @@
 				sendOpen(filename, data, wordViewer);
 			}
 		},
+		onEditWord: function (filename, data) {
+			// if file size is 0 we ask office online
+			// to create an empty docx file
+			var filesize = parseInt(data.$file.attr("data-size"));
+			if(filesize === 0) {
+				sendOpen(filename, data, wordNew);
+			} else {
+				sendOpen(filename, data, wordEditor);
+			}
+		},
 		onViewPowerpoint: function (filename, data) {
 			// if file size is 0 we ask office online
 			// to create an empty docx file
@@ -122,6 +134,16 @@
 				sendOpen(filename, data, powerpointNew);
 			} else {
 				sendOpen(filename, data, powerpointViewer);
+			}
+		},
+		onEditPowerpoint: function (filename, data) {
+			// if file size is 0 we ask office online
+			// to create an empty docx file
+			var filesize = parseInt(data.$file.attr("data-size"));
+			if(filesize === 0) {
+				sendOpen(filename, data, powerpointNew);
+			} else {
+				sendOpen(filename, data, powerpointEditor);
 			}
 		},
 		onViewExcel: function (filename, data) {
@@ -134,17 +156,29 @@
 				sendOpen(filename, data, excelViewer);
 			}
 		},
+		onEditExcel: function (filename, data) {
+			// if file size is 0 we ask office online
+			// to create an empty docx file
+			var filesize = parseInt(data.$file.attr("data-size"));
+			if(filesize === 0) {
+				sendOpen(filename, data, excelNew);
+			} else {
+				sendOpen(filename, data, excelEditor);
+			}
+		},
 	};
 
 
 	$(document).ready(function () {
 		if (OCA && OCA.Files) {
-			OCA.Files.fileActions.register('application/msword', 'View in Office Online', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewWord);
-			OCA.Files.fileActions.register('application/vnd.ms-powerpoint', 'View in Office Online', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewPowerpoint);
-			OCA.Files.fileActions.register('application/vnd.ms-excel', 'View in Office Online', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewExcel);
+			OCA.Files.fileActions.register('application/msword', 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditWord);
+			OCA.Files.fileActions.register('application/vnd.ms-powerpoint', 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditPowerpoint);
+			OCA.Files.fileActions.register('application/vnd.ms-excel', 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditExcel);
+
 			OCA.Files.fileActions.register('application/msword', 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewWord);
 			OCA.Files.fileActions.register('application/vnd.ms-powerpoint', 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewPowerpoint);
 			OCA.Files.fileActions.register('application/vnd.ms-excel', 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewExcel);
+
 			OCA.Files.fileActions.setDefault('application/msword', 'Default View');
 			OCA.Files.fileActions.setDefault('application/vnd.ms-powerpoint', 'Default View');
 			OCA.Files.fileActions.setDefault('application/vnd.ms-excel', 'Default View');

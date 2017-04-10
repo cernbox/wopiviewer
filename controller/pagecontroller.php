@@ -80,6 +80,8 @@ class PageController extends Controller {
 			$request->getQuery()->add("rgid", $gid);
 			$request->getQuery()->add("filename", $eosPath);
 			$request->getQuery()->add("canedit", $canedit);
+			$request->getQuery()->add("foldername", dirname($filename));
+
 			$displayName = "Guest";
 			$user = \OC::$server->getUserSession()->getUser();
 			if($user) {
