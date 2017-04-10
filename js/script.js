@@ -12,19 +12,6 @@
 	// just put WOPIViewer in global namespace so 
 	// the hack for owncloud 8 for having the new file menu entry can work.
 	OCA.WOPIViewer = {};
-/*
- *
- *         var wordViewer = "https://oos.cern.ch/wv/wordviewerframe.aspx?WOPISrc=";
- *         -       var wordEditor = "https://oos.cern.ch/wv/wordeditorframe.aspx?WOPISrc=";
- *         -       var powerpointViewerAndEditor = "https://oos.cern.ch/p/PowerPointFrame.aspx?WOPISrc=";
- *         -       var excelViewerAndEditor = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?WOPISrc=";
- *         +       var powerpointViewer = "https://oos.cern.ch/p/PowerPointFrame.aspx?WOPISrc=";
- *         +       var excelViewer = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?WOPISrc=";
- *
- *
- *
- */
-
 
 	var wordViewer = "https://oos.cern.ch/wv/wordviewerframe.aspx?WOPISrc=";
 	var wordNew = "https://oos.cern.ch/we/wordeditorframe.aspx?new=1&WOPISrc=";
