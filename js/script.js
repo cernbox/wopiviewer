@@ -158,17 +158,17 @@
 
 	$(document).ready(function () {
 		if (OCA && OCA.Files) {
-			OCA.Files.fileActions.register('application/msword', 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditWord);
-			OCA.Files.fileActions.register('application/vnd.ms-powerpoint', 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditPowerpoint);
-			OCA.Files.fileActions.register('application/vnd.ms-excel', 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditExcel);
+			OCA.Files.fileActions.register('application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditWord);
+			OCA.Files.fileActions.register('application/vnd.openxmlformats-officedocument.presentationml.presentation', 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditPowerpoint);
+			OCA.Files.fileActions.register('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditExcel);
 
-			OCA.Files.fileActions.register('application/msword', 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewWord);
-			OCA.Files.fileActions.register('application/vnd.ms-powerpoint', 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewPowerpoint);
-			OCA.Files.fileActions.register('application/vnd.ms-excel', 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewExcel);
+			OCA.Files.fileActions.register('application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewWord);
+			OCA.Files.fileActions.register('application/vnd.openxmlformats-officedocument.presentationml.presentation', 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewPowerpoint);
+			OCA.Files.fileActions.register('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewExcel);
 
-			OCA.Files.fileActions.setDefault('application/msword', 'Default View');
-			OCA.Files.fileActions.setDefault('application/vnd.ms-powerpoint', 'Default View');
-			OCA.Files.fileActions.setDefault('application/vnd.ms-excel', 'Default View');
+			OCA.Files.fileActions.setDefault('application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'Default View');
+			OCA.Files.fileActions.setDefault('application/vnd.openxmlformats-officedocument.presentationml.presentation', 'Default View');
+			OCA.Files.fileActions.setDefault('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Default View');
 		}
 	});
 

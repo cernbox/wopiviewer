@@ -18,7 +18,6 @@ use OCP\IRequest;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
-use Punic\Data;
 
 class PageController extends Controller {
 
@@ -26,13 +25,16 @@ class PageController extends Controller {
 	private $userId;
 	private $wopiBaseUrl;
 	private $wopiSecret;
+	private $shareManager;
+	private $eosUtil;
 
 	public function __construct($AppName, IRequest $request, $UserId) {
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;
-		$this->wopiSecret = \OC::$server->getConfig()->getSystemValue("wopi.secret", "http://wopiserver-test:8080");
-		$this->wopiBaseUrl = \OC::$server->getConfig()->getSystemValue("wopi.baseurl", "please change me");
-		$this->wopiCABundle = \OC::$server->getConfig()->getSystemValue("wopi.cabundle", true);
+		$this->wopiSecret = \OC::$server->getConfig()->getSystemValue("cbox.wopi.secret", "http://wopiserver-test:8080");
+		$this->wopiBaseUrl = \OC::$server->getConfig()->getSystemValue("cbox.wopi.baseurl", "please change me");
+		$this->wopiCABundle = \OC::$server->getConfig()->getSystemValue("cbox.wopi.cabundle", true); $this->shareManager = \OC::$server->getShareManager();
+		$this->eosUtil = \OC::$server->getCernBoxEosUtil();
 	}
 
 	/**
@@ -56,38 +58,34 @@ class PageController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function doOpen($filename) {
-		$username = \OC::$server->getUserSession()->getLoginName();
-		$uidAndGid = EosUtil::getUidAndGid($username);
-		if($uidAndGid === null) {
-			return new DataResponse(['error' => 'username does not have a valid uid and gid']); }
-		list($uid, $gid) = $uidAndGid;
-		if(!$uid || !$gid) {
-			return new DataResponse(['error' => 'username does not have a valid uid and gid']);
+		if(!$this->userId) {
+			return new DataResponse(['error' => 'user is not logged in']);
 		}
 
-		$node = \OC::$server->getUserFolder($username)->get($filename);
-		$info = $node->stat();
-		$eosPath = $info['eospath'];
-		$canedit = "false"; // we send boolean as strings to wopi
+		list($uid, $gid) = $this->eosUtil->getUidAndGidForUsername($this->userId);
+		if(!$uid || !$gid) {
+			return new DataResponse(['error' => 'user does not have valid uid/gid']);
+		}
+
+		$node = \OC::$server->getUserFolder($this->userId)->get($filename);
+		if(!$node) {
+			return new DataResponse(['error' => 'file does not exists']);
+		}
+		$canEdit = "false"; // we send boolean as strings to wopi
 		if ($node->isReadable()) {
 			if($node->isUpdateable()) {
-				$canedit = "true";
+				$canEdit = "true";
 			}
+			$eosPath = $node->stat()['eos.file'];
 			$client = new Client();
 			$request = $client->createRequest("GET", sprintf("%s/cbox/open", $this->wopiBaseUrl), null, null, ['verify' => $this->wopiCABundle]);
 			$request->addHeader("Authorization",  "Bearer " . $this->wopiSecret);
 			$request->getQuery()->add("ruid", $uid);
 			$request->getQuery()->add("rgid", $gid);
 			$request->getQuery()->add("filename", $eosPath);
-			$request->getQuery()->add("canedit", $canedit);
+			$request->getQuery()->add("canedit", $canEdit);
 			$request->getQuery()->add("foldername", dirname($filename));
-
-			$displayName = "Guest";
-			$user = \OC::$server->getUserSession()->getUser();
-			if($user) {
-				$displayName = $user->getDisplayName();
-			}
-			$request->getQuery()->add("username", $displayName);
+			$request->getQuery()->add("username", $this->userId);
 
 			$response = $client->send($request);
 			if ($response->getStatusCode() == 200) {
@@ -105,44 +103,40 @@ class PageController extends Controller {
 	 *
 	 * @PublicPage
 	 */
-	public function doPublicOpen($filename, $canedit, $token) {
+	public function doPublicOpen($filename, $canEdit, $token) {
 		$filename = trim($filename, "/");
 		$token = trim($token);
 		if(!$token) {
 			return new DataResponse(['error' => 'invalid token']);
 		}
 
-		$query = \OC_DB::prepare('SELECT * FROM oc_share WHERE  share_type = 3 AND token = ?');
-		$result = $query->execute([$token]);
-
-		$row = $result->fetchRow();
-		if(!$row) {
+		$share = $this->shareManager->getShareByToken($token);
+		if(!$share) {
 			return new DataResponse(['error' => 'invalid token']);
 		}
 
-		$owner = $row['uid_owner'];
-		$fileID = $row['item_source'];
-		$uidAndGid = EosUtil::getUidAndGid($owner);
-		if($uidAndGid === null) {
-			return new DataResponse(['error' => 'username does not have a valid uid and gid']);
-		}
-		list($uid, $gid) = $uidAndGid;
+		$owner = $share->getShareOwner();
+		$fileID = $share->getNodeId();
+
+		list($uid, $gid) = $this->eosUtil->getUidAndGidForUsername($owner);
 		if(!$uid || !$gid) {
-			return new DataResponse(['error' => 'username does not have a valid uid and gid']);
+			return new DataResponse(['error' => 'user does not have valid uid/gid']);
 		}
 
 		$node = \OC::$server->getUserFolder($owner)->getById($fileID)[0];
 		$filename = $node->getInternalPath() . "/" . $filename;
 		$info = $node->getStorage()->stat($filename);
-		$eosPath = $info['eospath'];
+		$eosPath = $info['eos.file'];
 		if ($node->isReadable()) {
 			$client = new Client();
-			$request = $client->createRequest("GET", sprintf("%s/cbox/open", $this->wopiBaseUrl), null, null, $this->wopiCABundle);
-			$request->addHeader("Authorization",  "Bearer cernboxsecret");
+			$request = $client->createRequest("GET", sprintf("%s/cbox/open", $this->wopiBaseUrl), null, null, ['verify' => $this->wopiCABundle]);
+			$request->addHeader("Authorization",  "Bearer " . $this->wopiSecret);
 			$request->getQuery()->add("ruid", $uid);
 			$request->getQuery()->add("rgid", $gid);
 			$request->getQuery()->add("filename", $eosPath);
-			$request->getQuery()->add("canedit", $canedit);
+			$request->getQuery()->add("canedit", $canEdit);
+			$request->getQuery()->add("foldername", dirname($filename));
+			$request->getQuery()->add("username", 'Guest');
 
 			$response = $client->send($request);
 			if ($response->getStatusCode() == 200) {

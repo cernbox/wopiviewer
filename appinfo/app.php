@@ -18,6 +18,13 @@ require_once __DIR__ . '/autoload.php';
 $app = new App('wopiviewer');
 $container = $app->getContainer();
 
+
+$domain = \OC::$server->getConfig()->getSystemValue("cbox.wopi.officeonline", 'https://oos.cern.ch');
+$policy = new \OCP\AppFramework\Http\EmptyContentSecurityPolicy();
+$policy->addAllowedScriptDomain($domain);
+$policy->addAllowedFrameDomain($domain);
+\OC::$server->getContentSecurityPolicyManager()->addDefaultPolicy($policy);
+
 \OCP\Util::addScript('wopiviewer', 'script');
 \OCP\Util::addStyle('wopiviewer', 'style');
 
