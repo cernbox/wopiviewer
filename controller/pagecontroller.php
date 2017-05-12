@@ -30,8 +30,8 @@ class PageController extends Controller {
 	public function __construct($AppName, IRequest $request, $UserId) {
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;
-		$this->wopiSecret = \OC::$server->getConfig()->getSystemValue("wopi.secret", "http://wopiserver-test:8080");
-		$this->wopiBaseUrl = \OC::$server->getConfig()->getSystemValue("wopi.baseurl", "please change me");
+		$this->wopiSecret = \OC::$server->getConfig()->getSystemValue("wopi.secret", "please change me");
+		$this->wopiBaseUrl = \OC::$server->getConfig()->getSystemValue("wopi.baseurl", "http://wopiserver-test:8080");
 		$this->wopiCABundle = \OC::$server->getConfig()->getSystemValue("wopi.cabundle", true);
 	}
 
@@ -131,6 +131,7 @@ class PageController extends Controller {
 			return new DataResponse(['error' => 'username does not have a valid uid and gid']);
 		}
 
+		\OC_Util::setupFS($owner);
 		$node = \OC::$server->getUserFolder($owner)->getById($fileID)[0];
 		$filename = $node->getInternalPath() . "/" . $filename;
 		$info = $node->getStorage()->stat($filename);
@@ -138,7 +139,7 @@ class PageController extends Controller {
 		if ($node->isReadable()) {
 			$client = new Client();
 			$request = $client->createRequest("GET", sprintf("%s/cbox/open", $this->wopiBaseUrl), null, null, ['verify' => $this->wopiCABundle]);
-			$request->addHeader("Authorization",  $this->wopiSecret);
+			$request->addHeader("Authorization",  "Bearer " . $this->wopiSecret);
 			$request->getQuery()->add("ruid", $uid);
 			$request->getQuery()->add("rgid", $gid);
 			$request->getQuery()->add("filename", $eosPath);
