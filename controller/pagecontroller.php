@@ -137,12 +137,14 @@ class PageController extends Controller {
 		$eosPath = $info['eospath'];
 		if ($node->isReadable()) {
 			$client = new Client();
-			$request = $client->createRequest("GET", sprintf("%s/cbox/open", $this->wopiBaseUrl), null, null, $this->wopiCABundle);
-			$request->addHeader("Authorization",  "Bearer cernboxsecret");
+			$request = $client->createRequest("GET", sprintf("%s/cbox/open", $this->wopiBaseUrl), null, null, ['verify' => $this->wopiCABundle]);
+			$request->addHeader("Authorization",  $this->wopiSecret);
 			$request->getQuery()->add("ruid", $uid);
 			$request->getQuery()->add("rgid", $gid);
 			$request->getQuery()->add("filename", $eosPath);
 			$request->getQuery()->add("canedit", $canedit);
+			$request->getQuery()->add("foldername", dirname($filename));
+			$request->getQuery()->add("username", "Guest");
 
 			$response = $client->send($request);
 			if ($response->getStatusCode() == 200) {
