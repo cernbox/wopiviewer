@@ -77,8 +77,10 @@
 			var token = getSharingToken();
 			url = OC.generateUrl('/apps/wopiviewer/publicopen');
 			data['token'] = token;
+			data['folderurl'] = parent.location.protocol+'//'+location.host+OC.generateUrl('/s/')+token+'?path='+OC.dirname(data.filename);
 		} else {
 			url = OC.generateUrl('/apps/wopiviewer/open');
+			data['folderurl'] = parent.location.protocol+'//'+location.host+OC.generateUrl('/apps/files/?dir=' + OC.dirname(data.filename));
 		}
 
 		$.post(url, data).success(function (response) {
