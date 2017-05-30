@@ -23,6 +23,15 @@
 	var excelNew = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?edit=1&new=1&WOPISrc=";
 	var excelEditor = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?edit=1&WOPISrc=";
 
+	var closeDocument = function (e) {
+		e.preventDefault();
+		$("#office_container").remove();
+		//$("header div#header #office_close_button").remove();
+		window.location.hash = '';
+		$(window).unbind('popstate', closeDocument);
+	};
+
+
 	var template = '<div id="office_container"><span id="frameholder"></span></div>';
 
 	var setView = function (actionURL, accessToken, filename) {
@@ -88,6 +97,9 @@
 				window.location.hash = 'office';
 				var viewerURL = targetURL + encodeURI(response.wopi_src);
 				setView(viewerURL, response.wopi_src, basename);
+				var closeButton = '<p class="" id="office_close_button" style="display: block; position: absolute; right: 50%; top: 5px"><b>The Office application is in beta</b></p>';
+				$("header div#header").append(closeButton);
+				$("header div#header #office_close_button").click(closeDocument);
 			} else {
 				alert(response.error);
 			}
