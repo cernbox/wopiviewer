@@ -169,6 +169,48 @@
 			OCA.Files.fileActions.setDefault('application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'Default View');
 			OCA.Files.fileActions.setDefault('application/vnd.openxmlformats-officedocument.presentationml.presentation', 'Default View');
 			OCA.Files.fileActions.setDefault('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Default View');
+
+			var myFileMenuPlugin = {
+				attach: function (menu) {
+					var fileList = menu.fileList;
+					menu.addMenuEntry({
+						id: 'wopi-new-powerpoint',
+						displayName: 'Powerpoint',
+						templateName: 'New presentation.pptx',
+						iconClass: 'icon-powerpoint',
+						fileType: 'file',
+						actionHandler: function (name) {
+							var dir = fileList.getCurrentDirectory();
+							// first create the file
+							fileList.createFile(name).then(function() {
+								// once the file got successfully created,
+								// open the editor
+							});
+						}
+					});
+					menu.addMenuEntry({
+						id: 'wopi-new-word',
+						displayName: 'Word',
+						templateName: 'New document.docx',
+						iconClass: 'icon-word',
+						fileType: 'file',
+						actionHandler: function () {
+							console.log('do something here');
+						}
+					});
+					menu.addMenuEntry({
+						id: 'wopi-new-excel',
+						displayName: 'Excel',
+						templateName: 'New spreadsheet.xlsx',
+						iconClass: 'icon-excel',
+						fileType: 'file',
+						actionHandler: function () {
+							console.log('do something here');
+						}
+					});
+				}
+			};
+			OC.Plugins.register('OCA.Files.NewFileMenu', myFileMenuPlugin);
 		}
 	});
 

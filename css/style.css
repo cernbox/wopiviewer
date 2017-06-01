@@ -28,3 +28,15 @@
 
 #office_container #office-close-button {
 }
+
+.icon-word {
+	background-image: url('../../../core/img/filetypes/x-office-document.svg');
+}
+
+.icon-excel{
+	background-image: url('../../../core/img/filetypes/x-office-spreadsheet.svg');
+}
+
+.icon-powerpoint {
+	background-image: url('../../../core/img/filetypes/x-office-presentation.svg');
+}
