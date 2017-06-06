@@ -57,7 +57,7 @@ class PageController extends Controller {
 	 *
 	 * @NoAdminRequired
 	 */
-	public function doOpen($filename) {
+	public function doOpen($filename, $folderurl) {
 		if(!$this->userId) {
 			return new DataResponse(['error' => 'user is not logged in']);
 		}
@@ -84,8 +84,13 @@ class PageController extends Controller {
 			$request->getQuery()->add("rgid", $gid);
 			$request->getQuery()->add("filename", $eosPath);
 			$request->getQuery()->add("canedit", $canEdit);
-			$request->getQuery()->add("foldername", dirname($filename));
-			$request->getQuery()->add("username", $this->userId);
+			$request->getQuery()->add("folderurl", $folderurl);
+
+			$user = \OC::$server->getUserSession()->getUser();
+			if($user) {
+				$displayName = $user->getDisplayName();
+				$request->getQuery()->add("username", $displayName);
+			}
 
 			$response = $client->send($request);
 			if ($response->getStatusCode() == 200) {
@@ -103,7 +108,7 @@ class PageController extends Controller {
 	 *
 	 * @PublicPage
 	 */
-	public function doPublicOpen($filename, $canEdit, $token) {
+	public function doPublicOpen($filename, $canedit, $token, $folderurl) {
 		$filename = trim($filename, "/");
 		$token = trim($token);
 		if(!$token) {
@@ -123,6 +128,12 @@ class PageController extends Controller {
 			return new DataResponse(['error' => 'user does not have valid uid/gid']);
 		}
 
+		$canEdit="false";
+		if($share->getPermissions()) {
+			$canEdit="true";
+		}
+
+		\OC_Util::setupFS($owner);
 		$node = \OC::$server->getUserFolder($owner)->getById($fileID)[0];
 		$filename = $node->getInternalPath() . "/" . $filename;
 		$info = $node->getStorage()->stat($filename);
@@ -135,8 +146,7 @@ class PageController extends Controller {
 			$request->getQuery()->add("rgid", $gid);
 			$request->getQuery()->add("filename", $eosPath);
 			$request->getQuery()->add("canedit", $canEdit);
-			$request->getQuery()->add("foldername", dirname($filename));
-			$request->getQuery()->add("username", 'Guest');
+			$request->getQuery()->add("folderurl", $folderurl);
 
 			$response = $client->send($request);
 			if ($response->getStatusCode() == 200) {

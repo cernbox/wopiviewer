@@ -23,6 +23,15 @@
 	var excelNew = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?edit=1&new=1&WOPISrc=";
 	var excelEditor = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?edit=1&WOPISrc=";
 
+	var closeDocument = function (e) {
+		e.preventDefault();
+		$("#office_container").remove();
+		//$("header div#header #office_close_button").remove();
+		window.location.hash = '';
+		$(window).unbind('popstate', closeDocument);
+	};
+
+
 	var template = '<div id="office_container"><span id="frameholder"></span></div>';
 
 	var setView = function (actionURL, accessToken, filename) {
@@ -77,8 +86,10 @@
 			var token = getSharingToken();
 			url = OC.generateUrl('/apps/wopiviewer/publicopen');
 			data['token'] = token;
+			data['folderurl'] = parent.location.protocol+'//'+location.host+OC.generateUrl('/s/')+token+'?path='+OC.dirname(data.filename);
 		} else {
 			url = OC.generateUrl('/apps/wopiviewer/open');
+			data['folderurl'] = parent.location.protocol+'//'+location.host+OC.generateUrl('/apps/files/?dir=' + OC.dirname(data.filename));
 		}
 
 		$.post(url, data).success(function (response) {
@@ -86,6 +97,9 @@
 				window.location.hash = 'office';
 				var viewerURL = targetURL + encodeURI(response.wopi_src);
 				setView(viewerURL, response.wopi_src, basename);
+				var closeButton = '<p class="" id="office_close_button" style="display: block; position: absolute; right: 50%; top: 5px"><b>The Office application is in beta</b></p>';
+				$("header div#header").append(closeButton);
+				$("header div#header #office_close_button").click(closeDocument);
 			} else {
 				alert(response.error);
 			}
@@ -185,6 +199,8 @@
 							fileList.createFile(name).then(function() {
 								// once the file got successfully created,
 								// open the editor
+								var selector = 'tr[data-file="'+ name +'"]';
+								fileList.$container.find(selector).find("span.nametext").click();
 							});
 						}
 					});
@@ -194,8 +210,15 @@
 						templateName: 'New document.docx',
 						iconClass: 'icon-word',
 						fileType: 'file',
-						actionHandler: function () {
-							console.log('do something here');
+						actionHandler: function (name) {
+							var dir = fileList.getCurrentDirectory();
+							// first create the file
+							fileList.createFile(name).then(function() {
+								// once the file got successfully created,
+								// open the editor
+								var selector = 'tr[data-file="'+ name +'"]';
+								fileList.$container.find(selector).find("span.nametext").click();
+							});
 						}
 					});
 					menu.addMenuEntry({
@@ -204,8 +227,15 @@
 						templateName: 'New spreadsheet.xlsx',
 						iconClass: 'icon-excel',
 						fileType: 'file',
-						actionHandler: function () {
-							console.log('do something here');
+						actionHandler: function (name) {
+							var dir = fileList.getCurrentDirectory();
+							// first create the file
+							fileList.createFile(name).then(function() {
+								// once the file got successfully created,
+								// open the editor
+								var selector = 'tr[data-file="'+ name +'"]';
+								fileList.$container.find(selector).find("span.nametext").click();
+							});
 						}
 					});
 				}
