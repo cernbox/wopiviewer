@@ -135,7 +135,12 @@ class PageController extends Controller {
 
 		\OC_Util::setupFS($owner);
 		$node = \OC::$server->getUserFolder($owner)->getById($fileID)[0];
-		$filename = $node->getInternalPath() . "/" . $filename;
+		if($node->getType() === \OCP\Files\FileInfo::TYPE_FILE) {
+			$filename = $node->getInternalPath();
+			$canEdit = "false";
+		} else {
+			$filename = $node->getInternalPath() . "/" . $filename;
+		}
 		$info = $node->getStorage()->stat($filename);
 		$eosPath = $info['eos.file'];
 		if ($node->isReadable()) {
