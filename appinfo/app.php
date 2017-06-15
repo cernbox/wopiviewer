@@ -19,10 +19,13 @@ $app = new App('wopiviewer');
 $container = $app->getContainer();
 
 
-$domain = \OC::$server->getConfig()->getSystemValue("cbox.wopi.officeonline", 'https://oos.cern.ch');
+$domains = \OC::$server->getConfig()->getSystemValue("cbox.wopi.officeonline", ['https://oos.web.cern.ch', 'http://wopiserver-test:8080']);
 $policy = new \OCP\AppFramework\Http\EmptyContentSecurityPolicy();
-$policy->addAllowedScriptDomain($domain);
-$policy->addAllowedFrameDomain($domain);
+foreach($domains as $domain) {
+	$policy->addAllowedScriptDomain($domain);
+	$policy->addAllowedFrameDomain($domain);
+	$policy->addAllowedConnectDomain($domain);
+}
 \OC::$server->getContentSecurityPolicyManager()->addDefaultPolicy($policy);
 
 \OCP\Util::addScript('wopiviewer', 'script');

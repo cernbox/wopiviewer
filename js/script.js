@@ -9,19 +9,36 @@
  */
 
 (function ($, OC, OCA) {	// just put WOPIViewer in global namespace so 
+
 	// just put WOPIViewer in global namespace so 
 	// the hack for owncloud 8 for having the new file menu entry can work.
 	OCA.WOPIViewer = {};
 
-	var wordViewer = "https://oos.cern.ch/wv/wordviewerframe.aspx?WOPISrc=";
-	var wordNew = "https://oos.cern.ch/we/wordeditorframe.aspx?new=1&WOPISrc=";
-	var wordEditor = "https://oos.cern.ch/we/wordeditorframe.aspx?WOPISrc=";
-	var powerpointViewer = "https://oos.cern.ch/p/PowerPointFrame.aspx?WOPISrc=";
-	var powerpointEditor = "https://oos.cern.ch/p/PowerPointFrame.aspx?PowerPointView=EditView&WOPISrc=";
-	var powerpointNew = "https://oos.cern.ch/p/PowerPointFrame.aspx?PowerPointView=EditView&New=1&WOPISrc=";
-	var excelViewer = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?WOPISrc=";
-	var excelNew = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?edit=1&new=1&WOPISrc=";
-	var excelEditor = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?edit=1&WOPISrc=";
+	var wordViewer;
+	var wordNew;
+	var wordEditor;
+	var powerpointViewer; 
+	var powerpointEditor;
+	var powerpointNew; 
+	var excelViewer;
+	var excelNew;
+	var excelEditor; 
+	
+	var loadConfig = function() {
+		var url = OC.generateUrl('/apps/wopiviewer/config');
+		$.get(url).success(function (response) {
+			OCA.WOPIViewer.endPoints = response;
+			wordViewer = response['.docx'].view + "?WOPISrc=";
+			wordEditor = response['.docx'].edit + "?WOPISrc=";
+			wordNew = response['.docx']['new'] + "?WOPISrc=";
+			powerpointViewer = response['.pptx'].view + "?WOPISrc=";
+			powerpointEditor = response['.pptx'].edit + "?WOPISrc=";
+			powerpointNew = response['.pptx']['new'] + "?WOPISrc=";
+			excelViewer = response['.xlsx'].view + "?WOPISrc=";
+			excelEditor = response['.xlsx'].edit + "?WOPISrc=";
+			excelNew = response['.xlsx']['new'] + "?WOPISrc=";
+		}); 
+	}
 
 	var closeDocument = function (e) {
 		e.preventDefault();
@@ -172,6 +189,7 @@
 
 	$(document).ready(function () {
 		if (OCA && OCA.Files) {
+			loadConfig();
 			OCA.Files.fileActions.register('application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditWord);
 			OCA.Files.fileActions.register('application/vnd.openxmlformats-officedocument.presentationml.presentation', 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditPowerpoint);
 			OCA.Files.fileActions.register('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditExcel);

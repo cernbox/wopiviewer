@@ -31,8 +31,8 @@ class PageController extends Controller {
 	public function __construct($AppName, IRequest $request, $UserId) {
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;
-		$this->wopiSecret = \OC::$server->getConfig()->getSystemValue("cbox.wopi.secret", "http://wopiserver-test:8080");
-		$this->wopiBaseUrl = \OC::$server->getConfig()->getSystemValue("cbox.wopi.baseurl", "please change me");
+		$this->wopiSecret = \OC::$server->getConfig()->getSystemValue("cbox.wopi.secret", "please change me");
+		$this->wopiBaseUrl = \OC::$server->getConfig()->getSystemValue("cbox.wopi.baseurl", "http://wopiserver-test:8080");
 		$this->wopiCABundle = \OC::$server->getConfig()->getSystemValue("cbox.wopi.cabundle", true); $this->shareManager = \OC::$server->getShareManager();
 		$this->eosUtil = \OC::$server->getCernBoxEosUtil();
 	}
@@ -50,6 +50,23 @@ class PageController extends Controller {
 	public function index() {
 		$params = ['user' => $this->userId];
 		return new TemplateResponse('wopiviewer', 'main', $params);  // templates/main.php
+	}
+
+	/**
+	 * @PublicPage
+	 */
+	public function doConfig() {
+			$client = new Client();
+			$request = $client->createRequest("GET", sprintf("%s/cbox/endpoints", $this->wopiBaseUrl), null, null, ['verify' => $this->wopiCABundle]);
+			$request->addHeader("Authorization",  "Bearer " . $this->wopiSecret);
+			$response = $client->send($request);
+			if ($response->getStatusCode() == 200) {
+				$body = $response->json();
+				return new DataResponse($body);
+			} else {
+				return new DataResponse(['error' => 'error opening file in wopi server']);
+			}
+		return new DataResponse(['wopiserver' => $this->wopiBaseUrl]);
 	}
 
 	/**
