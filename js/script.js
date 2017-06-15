@@ -28,15 +28,15 @@
 		var url = OC.generateUrl('/apps/wopiviewer/config');
 		$.get(url).success(function (response) {
 			OCA.WOPIViewer.endPoints = response;
-			wordViewer = response['.docx'].view + "?WOPISrc=";
-			wordEditor = response['.docx'].edit + "?WOPISrc=";
-			wordNew = response['.docx']['new'] + "?WOPISrc=";
-			powerpointViewer = response['.pptx'].view + "?WOPISrc=";
-			powerpointEditor = response['.pptx'].edit + "?WOPISrc=";
-			powerpointNew = response['.pptx']['new'] + "?WOPISrc=";
-			excelViewer = response['.xlsx'].view + "?WOPISrc=";
-			excelEditor = response['.xlsx'].edit + "?WOPISrc=";
-			excelNew = response['.xlsx']['new'] + "?WOPISrc=";
+			wordViewer = response['.docx'].view + "&WOPISrc=";
+			wordEditor = response['.docx'].edit + "&WOPISrc=";
+			wordNew = response['.docx']['new'] + "&WOPISrc=";
+			powerpointViewer = response['.pptx'].view + "&WOPISrc=";
+			powerpointEditor = response['.pptx'].edit + "&WOPISrc=";
+			powerpointNew = response['.pptx']['new'] + "&WOPISrc=";
+			excelViewer = response['.xlsx'].view + "&WOPISrc=";
+			excelEditor = response['.xlsx'].edit + "&WOPISrc=";
+			excelNew = response['.xlsx']['new'] + "&WOPISrc=";
 		}); 
 	}
 
