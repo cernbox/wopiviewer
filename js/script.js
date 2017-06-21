@@ -13,15 +13,15 @@
 	// the hack for owncloud 8 for having the new file menu entry can work.
 	OCA.WOPIViewer = {};
 
-	var wordViewer = "https://oos.cern.ch/wv/wordviewerframe.aspx?WOPISrc=";
-	var wordNew = "https://oos.cern.ch/we/wordeditorframe.aspx?new=1&WOPISrc=";
-	var wordEditor = "https://oos.cern.ch/we/wordeditorframe.aspx?WOPISrc=";
-	var powerpointViewer = "https://oos.cern.ch/p/PowerPointFrame.aspx?WOPISrc=";
-	var powerpointEditor = "https://oos.cern.ch/p/PowerPointFrame.aspx?PowerPointView=EditView&WOPISrc=";
-	var powerpointNew = "https://oos.cern.ch/p/PowerPointFrame.aspx?PowerPointView=EditView&New=1&WOPISrc=";
-	var excelViewer = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?WOPISrc=";
-	var excelNew = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?edit=1&new=1&WOPISrc=";
-	var excelEditor = "https://oos.cern.ch/x/_layouts/xlviewerinternal.aspx?edit=1&WOPISrc=";
+	var wordViewer = "https://oos.web.cern.ch/wv/wordviewerframe.aspx?WOPISrc=";
+	var wordNew = "https://oos.web.cern.ch/we/wordeditorframe.aspx?new=1&WOPISrc=";
+	var wordEditor = "https://oos.web.cern.ch/we/wordeditorframe.aspx?WOPISrc=";
+	var powerpointViewer = "https://oos.web.cern.ch/p/PowerPointFrame.aspx?WOPISrc=";
+	var powerpointEditor = "https://oos.web.cern.ch/p/PowerPointFrame.aspx?PowerPointView=EditView&WOPISrc=";
+	var powerpointNew = "https://oos.web.cern.ch/p/PowerPointFrame.aspx?PowerPointView=EditView&New=1&WOPISrc=";
+	var excelViewer = "https://oos.web.cern.ch/x/_layouts/xlviewerinternal.aspx?WOPISrc=";
+	var excelNew = "https://oos.web.cern.ch/x/_layouts/xlviewerinternal.aspx?edit=1&new=1&WOPISrc=";
+	var excelEditor = "https://oos.web.cern.ch/x/_layouts/xlviewerinternal.aspx?edit=1&WOPISrc=";
 
 	var closeDocument = function (e) {
 		e.preventDefault();
