@@ -22,8 +22,12 @@
 	var powerpointNew; 
 	var excelViewer;
 	var excelNew;
-	var excelEditor; 
-	
+	var excelEditor;
+
+	var wordMime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+	var excelMime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+	var powertpointMime = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+
 	var loadConfig = function() {
 		var url = OC.generateUrl('/apps/wopiviewer/config');
 		$.get(url).success(function (response) {
@@ -88,7 +92,7 @@
 		}
 	};
 
-	var sendOpen = function (basename, data, targetURL, canedit) {
+	var sendOpen = function (basename, data, targetURL) {
 		var canedit = false;
 		var permissions = data.$file.attr("data-permissions");
 		if (permissions > 1) { // > 1 write permissions
@@ -96,7 +100,7 @@
 		}
 		filename = data.dir + "/" + basename;
 
-		var data = {filename: filename, canedit: canedit};
+		var data = {filename: filename};
 		var url = "";
 		// check if we are on a public page
 		if (isPublicPage()) {
@@ -123,6 +127,21 @@
 		});
 	};
 
+	var getUrlParameter = function getUrlParameter (sParam) {
+		var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+			sURLVariables = sPageURL.split('&'),
+			sParameterName,
+			i;
+		for (i = 0; i < sURLVariables.length; i++) {
+			sParameterName = sURLVariables[i].split('=');
+
+			if (sParameterName[0] === sParam) {
+				return sParameterName[1] === undefined ? true : sParameterName[1];
+			}
+		}
+	};
+
+
 	var wopiViewer = {
 		onViewWord: function (filename, data) {
 			// if file size is 0 we ask office online
@@ -134,6 +153,7 @@
 				sendOpen(filename, data, wordViewer);
 			}
 		},
+
 		onEditWord: function (filename, data) {
 			// if file size is 0 we ask office online
 			// to create an empty docx file
@@ -144,6 +164,29 @@
 				sendOpen(filename, data, wordEditor);
 			}
 		},
+
+		onViewWordInPublicSingleFile: function (token) {
+			var token = getSharingToken();
+			url = OC.generateUrl('/apps/wopiviewer/publicopen');
+			var data = {filename: null};
+			data['token'] = token;
+			if (getUrlParameter('closed') === '1') {
+				return;
+			}
+			data['folderurl'] = parent.location.protocol + '//' + location.host + OC.generateUrl('/s/') + token + "?closed=1";
+			$.post(url, data).success(function (response) {
+				if (response.wopi_src) {
+					window.location.hash = 'office';
+					var viewerURL = wordViewer + encodeURI(response.wopi_src);
+					setView(viewerURL, response.wopi_src, token);
+				} else {
+					alert(response.error);
+				}
+			});
+		},
+
+
+
 		onViewPowerpoint: function (filename, data) {
 			// if file size is 0 we ask office online
 			// to create an empty docx file
@@ -164,6 +207,28 @@
 				sendOpen(filename, data, powerpointEditor);
 			}
 		},
+
+		onViewPowerpointInPublicSingleFile: function (token) {
+			var token = getSharingToken();
+			url = OC.generateUrl('/apps/wopiviewer/publicopen');
+			var data = {filename: null};
+			data['token'] = token;
+			if (getUrlParameter('closed') === '1') {
+				return;
+			}
+			data['folderurl'] = parent.location.protocol + '//' + location.host + OC.generateUrl('/s/') + token + "?closed=1";
+			$.post(url, data).success(function (response) {
+				if (response.wopi_src) {
+					window.location.hash = 'office';
+					var viewerURL = powerpointViewer + encodeURI(response.wopi_src);
+					setView(viewerURL, response.wopi_src, token);
+				} else {
+					alert(response.error);
+				}
+			});
+		},
+
+
 		onViewExcel: function (filename, data) {
 			// if file size is 0 we ask office online
 			// to create an empty docx file
@@ -174,6 +239,7 @@
 				sendOpen(filename, data, excelViewer);
 			}
 		},
+
 		onEditExcel: function (filename, data) {
 			// if file size is 0 we ask office online
 			// to create an empty docx file
@@ -184,23 +250,43 @@
 				sendOpen(filename, data, excelEditor);
 			}
 		},
+
+		onViewExcelInPublicSingleFile: function (token) {
+			var token = getSharingToken();
+			url = OC.generateUrl('/apps/wopiviewer/publicopen');
+			var data = {filename: null};
+			data['token'] = token;
+			if (getUrlParameter('closed') === '1') {
+				return;
+			}
+			data['folderurl'] = parent.location.protocol + '//' + location.host + OC.generateUrl('/s/') + token + "?closed=1";
+			$.post(url, data).success(function (response) {
+				if (response.wopi_src) {
+					window.location.hash = 'office';
+					var viewerURL = excelViewer + encodeURI(response.wopi_src);
+					setView(viewerURL, response.wopi_src, token);
+				} else {
+					alert(response.error);
+				}
+			});
+		},
 	};
 
 
 	$(document).ready(function () {
 		if (OCA && OCA.Files) {
 			loadConfig();
-			OCA.Files.fileActions.register('application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditWord);
-			OCA.Files.fileActions.register('application/vnd.openxmlformats-officedocument.presentationml.presentation', 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditPowerpoint);
-			OCA.Files.fileActions.register('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditExcel);
+			OCA.Files.fileActions.register(wordMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditWord);
+			OCA.Files.fileActions.register(powertpointMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditPowerpoint);
+			OCA.Files.fileActions.register(excelMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditExcel);
 
-			OCA.Files.fileActions.register('application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewWord);
-			OCA.Files.fileActions.register('application/vnd.openxmlformats-officedocument.presentationml.presentation', 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewPowerpoint);
-			OCA.Files.fileActions.register('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewExcel);
+			OCA.Files.fileActions.register(wordMime, 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewWord);
+			OCA.Files.fileActions.register(powertpointMime, 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewPowerpoint);
+			OCA.Files.fileActions.register(excelMime, 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewExcel);
 
-			OCA.Files.fileActions.setDefault('application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'Default View');
-			OCA.Files.fileActions.setDefault('application/vnd.openxmlformats-officedocument.presentationml.presentation', 'Default View');
-			OCA.Files.fileActions.setDefault('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Default View');
+			OCA.Files.fileActions.setDefault(wordMime, 'Default View');
+			OCA.Files.fileActions.setDefault(powertpointMime, 'Default View');
+			OCA.Files.fileActions.setDefault(excelMime, 'Default View');
 
 			var myFileMenuPlugin = {
 				attach: function (menu) {
@@ -260,6 +346,25 @@
 			};
 			OC.Plugins.register('OCA.Files.NewFileMenu', myFileMenuPlugin);
 		}
+
+		// Doesn't work with IE below 9
+		if (!$.browser.msie || ($.browser.msie && $.browser.version >= 9)) {
+				if ($('#isPublic').val()) {
+					var sharingToken = $('#sharingToken').val();
+					mime = $('#mimetype').val();
+					switch (mime) {
+						case wordMime:
+							wopiViewer.onViewWordInPublicSingleFile(sharingToken);
+							break;
+						case excelMime: wopiViewer.onViewExcelInPublicSingleFile(sharingToken);
+							break;
+						case powertpointMime:
+							wopiViewer.onViewPowerpointInPublicSingleFile(sharingToken);
+							break;
+					}
+				}
+		}
+
 	});
 
 })(jQuery, OC, OCA);
