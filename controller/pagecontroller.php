@@ -33,7 +33,8 @@ class PageController extends Controller {
 		$this->userId = $UserId;
 		$this->wopiSecret = \OC::$server->getConfig()->getSystemValue("cbox.wopi.secret", "please change me");
 		$this->wopiBaseUrl = \OC::$server->getConfig()->getSystemValue("cbox.wopi.baseurl", "http://wopiserver-test:8080");
-		$this->wopiCABundle = \OC::$server->getConfig()->getSystemValue("cbox.wopi.cabundle", true); $this->shareManager = \OC::$server->getShareManager();
+		$this->wopiCABundle = \OC::$server->getConfig()->getSystemValue("cbox.wopi.cabundle", true); 
+		$this->shareManager = \OC::$server->getShareManager();
 		$this->eosUtil = \OC::$server->getCernBoxEosUtil();
 	}
 
