@@ -5,11 +5,10 @@
     <description>WOPI Viewer</description>
     <licence>AGPL</licence>
     <author>Hugo Gonzalez Labrador (CERN)</author>
-    <author>Michael D'Silva (AARNet)</author>
     <version>0.0.1</version>
     <namespace>WopiViewer</namespace>
     <category>other</category>
     <dependencies>
-        <owncloud min-version="8.2.2" />
+        <owncloud min-version="8.2.2" max-version="20.0" />
     </dependencies>
 </info>
