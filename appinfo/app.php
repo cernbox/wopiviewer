@@ -9,9 +9,11 @@
  * @copyright Hugo Gonzalez Labrador (CERN) 2017
  */
 
-$policy = new OCP\AppFramework\Http\EmptyContentSecurityPolicy();
-$policy->addAllowedFrameDomain(\OC::$server->getConfig()->getSystemValue('wopi.oos','self'));
-\OC::$server->getContentSecurityPolicyManager()->addDefaultPolicy($policy);
+if (\OCP\Util::getVersion()[0] >= 10) {
+	$policy = new OCP\AppFramework\Http\EmptyContentSecurityPolicy();
+	$policy->addAllowedFrameDomain(\OC::$server->getConfig()->getSystemValue('wopi.oos','self'));
+	\OC::$server->getContentSecurityPolicyManager()->addDefaultPolicy($policy);
+}
 
 \OCP\Util::addScript('wopiviewer', 'script');
 \OCP\Util::addStyle('wopiviewer', 'style');
