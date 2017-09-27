@@ -12,13 +12,15 @@
 namespace OCA\WopiViewer\Controller;
 
 use Guzzle\Http\Client;
-use OC\Files\ObjectStore\EosProxy;
-use OC\Files\ObjectStore\EosUtil;
+//use OC\Files\ObjectStore\EosProxy;
+//use OC\Files\ObjectStore\EosUtil;
 use OCP\IRequest;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
 use Punic\Data;
+use OC\Files\Filesystem;
+use OC\Files\View;
 
 class PageController extends Controller {
 
@@ -26,6 +28,7 @@ class PageController extends Controller {
 	private $userId;
 	private $wopiBaseUrl;
 	private $wopiSecret;
+	private $wopiOOS;
 
 	public function __construct($AppName, IRequest $request, $UserId) {
 		parent::__construct($AppName, $request);
@@ -33,6 +36,12 @@ class PageController extends Controller {
 		$this->wopiSecret = \OC::$server->getConfig()->getSystemValue("wopi.secret", "please change me");
 		$this->wopiBaseUrl = \OC::$server->getConfig()->getSystemValue("wopi.baseurl", "http://wopiserver-test:8080");
 		$this->wopiCABundle = \OC::$server->getConfig()->getSystemValue("wopi.cabundle", true);
+		$this->wopiOOS = \OC::$server->getConfig()->getSystemValue("wopi.oos", "https://oos-test");
+
+		$view = new \OC\Files\View('/' . $UserId);
+		if (!$view->is_dir('wopi')) {
+			$view->mkdir('wopi');
+		}
 	}
 
 	/**
@@ -56,6 +65,8 @@ class PageController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function doOpen($filename, $folderurl) {
+		$username = \OC::$server->getUserSession()->getUser()->getUID();
+		/*
 		$username = \OC::$server->getUserSession()->getLoginName();
 		$uidAndGid = EosUtil::getUidAndGid($username);
 		if($uidAndGid === null) {
@@ -63,18 +74,20 @@ class PageController extends Controller {
 		list($uid, $gid) = $uidAndGid;
 		if(!$uid || !$gid) {
 			return new DataResponse(['error' => 'username does not have a valid uid and gid']);
-		}
-
+		}*/
 		$node = \OC::$server->getUserFolder($username)->get($filename);
 		$info = $node->stat();
-		$eosPath = $info['eospath'];
+		//$eosPath = $info['eospath'];
+		$eosPath = $node->getPath();
+		$uid = $info['uid'];
+		$gid = $info['gid'];
 		$canedit = "false"; // we send boolean as strings to wopi
 		if ($node->isReadable()) {
 			if($node->isUpdateable()) {
 				$canedit = "true";
 			}
 			$client = new Client();
-			$request = $client->createRequest("GET", sprintf("%s/cbox/open", $this->wopiBaseUrl), null, null, ['verify' => $this->wopiCABundle]);
+			$request = $client->createRequest("GET", sprintf("%s/wopi/cbox/open", $this->wopiBaseUrl), null, null, ['verify' => $this->wopiCABundle]);
 			$request->addHeader("Authorization",  "Bearer " . $this->wopiSecret);
 			$request->getQuery()->add("ruid", $uid);
 			$request->getQuery()->add("rgid", $gid);
@@ -92,7 +105,7 @@ class PageController extends Controller {
 			if ($response->getStatusCode() == 200) {
 				$body = $response->getBody(true);
 				$body = urldecode($body);
-				return new DataResponse(['wopi_src' => $body]);
+				return new DataResponse(['wopi_src' => $body, 'oos' => $this->wopiOOS]);
 			} else {
 				return new DataResponse(['error' => 'error opening file in wopi server']);
 			}
@@ -121,6 +134,7 @@ class PageController extends Controller {
 
 		$owner = $row['uid_owner'];
 		$fileID = $row['item_source'];
+		/*
 		$uidAndGid = EosUtil::getUidAndGid($owner);
 		if($uidAndGid === null) {
 			return new DataResponse(['error' => 'username does not have a valid uid and gid']);
@@ -129,6 +143,7 @@ class PageController extends Controller {
 		if(!$uid || !$gid) {
 			return new DataResponse(['error' => 'username does not have a valid uid and gid']);
 		}
+		*/
 
 		$canedit="false";
 		if((int)($row['permissions']) > 1) {
@@ -142,7 +157,7 @@ class PageController extends Controller {
 		$eosPath = $info['eospath'];
 		if ($node->isReadable()) {
 			$client = new Client();
-			$request = $client->createRequest("GET", sprintf("%s/cbox/open", $this->wopiBaseUrl), null, null, ['verify' => $this->wopiCABundle]);
+			$request = $client->createRequest("GET", sprintf("%s/wopi/cbox/open", $this->wopiBaseUrl), null, null, ['verify' => $this->wopiCABundle]);
 			$request->addHeader("Authorization",  "Bearer " . $this->wopiSecret);
 			$request->getQuery()->add("ruid", $uid);
 			$request->getQuery()->add("rgid", $gid);
@@ -154,7 +169,7 @@ class PageController extends Controller {
 			if ($response->getStatusCode() == 200) {
 				$body = $response->getBody(true);
 				$body = urldecode($body);
-				return new DataResponse(['wopi_src' => $body]);
+				return new DataResponse(['wopi_src' => $body, 'oos' => $this->wopiOOS]);
 			} else {
 				return new DataResponse(['error' => 'error opening file in wopi server']);
 			}

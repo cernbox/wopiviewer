@@ -19,7 +19,7 @@
  */
 return [
     'routes' => [
-	   ['name' => 'page#do_open', 'url' => '/open', 'verb' => 'POST'],
-		['name' => 'page#do_public_open', 'url' => '/publicopen', 'verb' => 'POST'],
+	['name' => 'page#do_open', 'url' => '/open', 'verb' => 'POST'],
+	['name' => 'page#do_public_open', 'url' => '/publicopen', 'verb' => 'POST'],
     ]
 ];

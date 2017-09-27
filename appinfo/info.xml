@@ -9,6 +9,6 @@
     <namespace>WopiViewer</namespace>
     <category>other</category>
     <dependencies>
-        <owncloud min-version="8.2.2" />
+        <owncloud min-version="8.2.2" max-version="20.0" />
     </dependencies>
 </info>
