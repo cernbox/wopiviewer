@@ -147,7 +147,7 @@ class PageController extends Controller {
 		}
 
 		$canEdit="false";
-		if($share->getPermissions()) {
+		if($share->getPermissions() & \OCP\Constants::PERMISSION_UPDATE) {
 			$canEdit="true";
 		}
 
