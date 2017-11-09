@@ -348,7 +348,7 @@
 		}
 
 		// Doesn't work with IE below 9
-		if (!$.browser.msie || ($.browser.msie && $.browser.version >= 9)) {
+		if (! ($.browser.msie && $.browser.version < 9)) {
 				if ($('#isPublic').val()) {
 					var sharingToken = $('#sharingToken').val();
 					mime = $('#mimetype').val();
