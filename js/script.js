@@ -347,8 +347,37 @@
 			OC.Plugins.register('OCA.Files.NewFileMenu', myFileMenuPlugin);
 		}
 
-		// Doesn't work with IE below 9
-		if (! ($.browser.msie && $.browser.version < 9)) {
+		// Doesn't work with:
+		// 	IE below 9, 
+		// 	Safari 
+		// 		for Windows 
+		// 		for Android
+		// 		for Mac OS with version below 10.8
+		// 	Tablet versions of Chrome/Firefox of iOS and Android
+		if (! ( (
+				$.browser.msie && 
+				$.browser.version < 9
+			) || (
+				(
+					navigator.userAgent.indexOf("Safari") > -1 && 
+					navigator.userAgent.indexOf('Chrome') == -1
+				) && (
+					navigator.userAgent.indexOf("Windows") > -1 ||
+					navigator.userAgent.indexOf("Android") > -1 ||
+					(
+						navigator.userAgent.indexOf("Mac OS") > -1 &&
+						$.browser.version < 10.8
+					)
+				)
+			) || (
+				(
+					navigator.userAgent.indexOf("iOS") > 1 || 
+					navigator.userAgent.indexOf("Android") 
+				) &&
+				navigator.userAgent.indexOf("Mozilla") > -1 &&
+				navigator.userAgent.indexOf("Mobile") == -1
+			)
+		) ) {
 				if ($('#isPublic').val()) {
 					var sharingToken = $('#sharingToken').val();
 					mime = $('#mimetype').val();
