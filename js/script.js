@@ -276,6 +276,9 @@
 	$(document).ready(function () {
 		if (OCA && OCA.Files) {
 			loadConfig();
+			if(localStorage.getItem('office_engine') !== 'msoffice') {
+				return "";
+			}
 			OCA.Files.fileActions.register(wordMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditWord);
 			OCA.Files.fileActions.register(powertpointMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditPowerpoint);
 			OCA.Files.fileActions.register(excelMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditExcel);
