@@ -118,9 +118,9 @@
 				window.location.hash = 'office';
 				var viewerURL = targetURL + encodeURI(response.wopi_src);
 				setView(viewerURL, response.wopi_src, basename);
-				var closeButton = '<p class="" id="office_close_button" style="display: block; position: absolute; right: 50%; top: 5px"><b>The Office application is in beta</b></p>';
-				$("header div#header").append(closeButton);
-				$("header div#header #office_close_button").click(closeDocument);
+				//var closeButton = '<p class="" id="office_close_button" style="display: block; position: absolute; right: 50%; top: 5px"><b>The Office application is in beta</b></p>';
+				//$("header div#header").append(closeButton);
+				//$("header div#header #office_close_button").click(closeDocument);
 			} else {
 				alert(response.error);
 			}
