@@ -222,7 +222,6 @@
 					window.location.hash = 'office';
 					var viewerURL = powerpointViewer + encodeURI(response.wopi_src);
 					setView(viewerURL, response.wopi_src, token);
-				} else {
 					alert(response.error);
 				}
 			});
@@ -274,8 +273,9 @@
 
 
 	$(document).ready(function () {
-		if (OCA && OCA.Files) {
-			loadConfig();
+		loadConfig();
+		var engine = localStorage.getItem("office-engine");
+		if (OCA && OCA.Files && engine == "microsoft") {
 			OCA.Files.fileActions.register(wordMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditWord);
 			OCA.Files.fileActions.register(powertpointMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditPowerpoint);
 			OCA.Files.fileActions.register(excelMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditExcel);
