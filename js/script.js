@@ -122,7 +122,7 @@
 				//$("header div#header").append(closeButton);
 				//$("header div#header #office_close_button").click(closeDocument);
 			} else {
-				alert(response.error);
+				console.error(response.error);
 			}
 		});
 	};
@@ -180,7 +180,7 @@
 					var viewerURL = wordViewer + encodeURI(response.wopi_src);
 					setView(viewerURL, response.wopi_src, token);
 				} else {
-					alert(response.error);
+					console.error(response.error);
 				}
 			});
 		},
@@ -223,7 +223,7 @@
 					var viewerURL = powerpointViewer + encodeURI(response.wopi_src);
 					setView(viewerURL, response.wopi_src, token);
 				} else {
-					alert(response.error);
+					console.error(response.error);
 				}
 			});
 		},
@@ -266,7 +266,7 @@
 					var viewerURL = excelViewer + encodeURI(response.wopi_src);
 					setView(viewerURL, response.wopi_src, token);
 				} else {
-					alert(response.error);
+					console.error(response.error);
 				}
 			});
 		},
