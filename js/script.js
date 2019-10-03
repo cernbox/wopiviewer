@@ -276,7 +276,7 @@
 	$(document).ready(function () {
 		loadConfig();
 		var engine = localStorage.getItem("office-engine");
-		if (OCA && OCA.Files && engine == "microsoft") {
+		if (OCA && OCA.Files && (engine == "microsoft" || engine === "")) {
 			OCA.Files.fileActions.register(wordMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditWord);
 			OCA.Files.fileActions.register(powertpointMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditPowerpoint);
 			OCA.Files.fileActions.register(excelMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditExcel);
@@ -346,24 +346,24 @@
 				}
 			};
 			OC.Plugins.register('OCA.Files.NewFileMenu', myFileMenuPlugin);
-		}
 
-		// Doesn't work with IE below 9
-		if (!$.browser.msie || ($.browser.msie && $.browser.version >= 9)) {
-				if ($('#isPublic').val()) {
-					var sharingToken = $('#sharingToken').val();
-					mime = $('#mimetype').val();
-					switch (mime) {
-						case wordMime:
-							wopiViewer.onViewWordInPublicSingleFile(sharingToken);
-							break;
-						case excelMime: wopiViewer.onViewExcelInPublicSingleFile(sharingToken);
-							break;
-						case powertpointMime:
-							wopiViewer.onViewPowerpointInPublicSingleFile(sharingToken);
-							break;
+			// Doesn't work with IE below 9
+			if (!$.browser.msie || ($.browser.msie && $.browser.version >= 9)) {
+					if ($('#isPublic').val()) {
+						var sharingToken = $('#sharingToken').val();
+						mime = $('#mimetype').val();
+						switch (mime) {
+							case wordMime:
+								wopiViewer.onViewWordInPublicSingleFile(sharingToken);
+								break;
+							case excelMime: wopiViewer.onViewExcelInPublicSingleFile(sharingToken);
+								break;
+							case powertpointMime:
+								wopiViewer.onViewPowerpointInPublicSingleFile(sharingToken);
+								break;
+						}
 					}
-				}
+			}
 		}
 
 	});
