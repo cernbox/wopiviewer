@@ -278,7 +278,7 @@
 
 		if ($('#isPublic').val()) {
 			finish($('#officeEngine').val());
-		} else {
+		} else if (!$('#body-login').length) { // don't show office in the login page (including public links with password)
 			$.getJSON( OC.generateUrl('/apps/office'), function(response) {
 				finish(response.engine);
 			});
