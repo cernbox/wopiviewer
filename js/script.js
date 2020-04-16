@@ -276,17 +276,9 @@
 	$(document).ready(function () {
 		loadConfig();
 
-		OCA.Files.fileActions.register(wordMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditWord);
-		OCA.Files.fileActions.register(powertpointMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditPowerpoint);
-		OCA.Files.fileActions.register(excelMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditExcel);
-
-		OCA.Files.fileActions.register(wordMime, 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewWord);
-		OCA.Files.fileActions.register(powertpointMime, 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewPowerpoint);
-		OCA.Files.fileActions.register(excelMime, 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewExcel);
-
-		OCA.Files.fileActions.setDefault(wordMime, 'Default View');
-		OCA.Files.fileActions.setDefault(powertpointMime, 'Default View');
-		OCA.Files.fileActions.setDefault(excelMime, 'Default View');
+		OCA.Files.fileActions.register(wordMime, 'Open in MS Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onViewWord);
+		OCA.Files.fileActions.register(powertpointMime, 'Open in MS Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onViewPowerpoint);
+		OCA.Files.fileActions.register(excelMime, 'Open in MS Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onViewExcel);
 
 		// !! Do not add MS Office to the "new" button to prevent users from creating files using it !!
 		// var myFileMenuPlugin = {
