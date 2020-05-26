@@ -277,9 +277,9 @@
 		loadConfig();
 
 		if (OCA.Files != null) {
-			OCA.Files.fileActions.register(wordMime, 'Open in MS Office Online', OC.PERMISSION_UPDATE, OC.imagePath('wopiviewer', 'msoffice_logo.svg'), wopiViewer.onViewWord);
-			OCA.Files.fileActions.register(powertpointMime, 'Open in MS Office Online', OC.PERMISSION_UPDATE, OC.imagePath('wopiviewer', 'msoffice_logo.svg'), wopiViewer.onViewPowerpoint);
-			OCA.Files.fileActions.register(excelMime, 'Open in MS Office Online', OC.PERMISSION_UPDATE, OC.imagePath('wopiviewer', 'msoffice_logo.svg'), wopiViewer.onViewExcel);
+			OCA.Files.fileActions.register(wordMime, 'Open in MS Office Online', OC.PERMISSION_READ, OC.imagePath('wopiviewer', 'msoffice_logo.svg'), wopiViewer.onViewWord);
+			OCA.Files.fileActions.register(powertpointMime, 'Open in MS Office Online', OC.PERMISSION_READ, OC.imagePath('wopiviewer', 'msoffice_logo.svg'), wopiViewer.onViewPowerpoint);
+			OCA.Files.fileActions.register(excelMime, 'Open in MS Office Online', OC.PERMISSION_READ, OC.imagePath('wopiviewer', 'msoffice_logo.svg'), wopiViewer.onViewExcel);
 		}
 
 		// !! Do not add MS Office to the "new" button to prevent users from creating files using it !!
