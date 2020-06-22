@@ -274,97 +274,91 @@
 
 
 	$(document).ready(function () {
-		if (OCA && OCA.Files) {
-			loadConfig();
-			OCA.Files.fileActions.register(wordMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditWord);
-			OCA.Files.fileActions.register(powertpointMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditPowerpoint);
-			OCA.Files.fileActions.register(excelMime, 'Edit in Office Online', OC.PERMISSION_UPDATE, OC.imagePath('core', 'actions/play'), wopiViewer.onEditExcel);
+		loadConfig();
 
-			OCA.Files.fileActions.register(wordMime, 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewWord);
-			OCA.Files.fileActions.register(powertpointMime, 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewPowerpoint);
-			OCA.Files.fileActions.register(excelMime, 'Default View', OC.PERMISSION_READ, OC.imagePath('core', 'actions/play'), wopiViewer.onViewExcel);
-
-			OCA.Files.fileActions.setDefault(wordMime, 'Default View');
-			OCA.Files.fileActions.setDefault(powertpointMime, 'Default View');
-			OCA.Files.fileActions.setDefault(excelMime, 'Default View');
-
-			var myFileMenuPlugin = {
-				attach: function (menu) {
-					var fileList = menu.fileList;
-					menu.addMenuEntry({
-						id: 'wopi-new-powerpoint',
-						displayName: 'Powerpoint',
-						templateName: 'New presentation.pptx',
-						iconClass: 'icon-powerpoint',
-						fileType: 'file',
-						actionHandler: function (name) {
-							var dir = fileList.getCurrentDirectory();
-							// first create the file
-							fileList.createFile(name).then(function() {
-								// once the file got successfully created,
-								// open the editor
-								var selector = 'tr[data-file="'+ name +'"]';
-								fileList.$container.find(selector).find("span.nametext").click();
-							});
-						}
-					});
-					menu.addMenuEntry({
-						id: 'wopi-new-word',
-						displayName: 'Word',
-						templateName: 'New document.docx',
-						iconClass: 'icon-word',
-						fileType: 'file',
-						actionHandler: function (name) {
-							var dir = fileList.getCurrentDirectory();
-							// first create the file
-							fileList.createFile(name).then(function() {
-								// once the file got successfully created,
-								// open the editor
-								var selector = 'tr[data-file="'+ name +'"]';
-								fileList.$container.find(selector).find("span.nametext").click();
-							});
-						}
-					});
-					menu.addMenuEntry({
-						id: 'wopi-new-excel',
-						displayName: 'Excel',
-						templateName: 'New spreadsheet.xlsx',
-						iconClass: 'icon-excel',
-						fileType: 'file',
-						actionHandler: function (name) {
-							var dir = fileList.getCurrentDirectory();
-							// first create the file
-							fileList.createFile(name).then(function() {
-								// once the file got successfully created,
-								// open the editor
-								var selector = 'tr[data-file="'+ name +'"]';
-								fileList.$container.find(selector).find("span.nametext").click();
-							});
-						}
-					});
-				}
-			};
-			OC.Plugins.register('OCA.Files.NewFileMenu', myFileMenuPlugin);
+		if (OCA.Files != null) {
+			OCA.Files.fileActions.register(wordMime, 'Open in MS Office Online', OC.PERMISSION_READ, OC.imagePath('wopiviewer', 'msoffice_logo.svg'), wopiViewer.onViewWord);
+			OCA.Files.fileActions.register(powertpointMime, 'Open in MS Office Online', OC.PERMISSION_READ, OC.imagePath('wopiviewer', 'msoffice_logo.svg'), wopiViewer.onViewPowerpoint);
+			OCA.Files.fileActions.register(excelMime, 'Open in MS Office Online', OC.PERMISSION_READ, OC.imagePath('wopiviewer', 'msoffice_logo.svg'), wopiViewer.onViewExcel);
 		}
 
-		// Doesn't work with IE below 9
-		if (!$.browser.msie || ($.browser.msie && $.browser.version >= 9)) {
-				if ($('#isPublic').val()) {
-					var sharingToken = $('#sharingToken').val();
-					mime = $('#mimetype').val();
-					switch (mime) {
-						case wordMime:
-							wopiViewer.onViewWordInPublicSingleFile(sharingToken);
-							break;
-						case excelMime: wopiViewer.onViewExcelInPublicSingleFile(sharingToken);
-							break;
-						case powertpointMime:
-							wopiViewer.onViewPowerpointInPublicSingleFile(sharingToken);
-							break;
-					}
-				}
-		}
+		// !! Do not add MS Office to the "new" button to prevent users from creating files using it !!
+		// var myFileMenuPlugin = {
+		// 	attach: function (menu) {
+		// 		var fileList = menu.fileList;
+		// 		menu.addMenuEntry({
+		// 			id: 'wopi-new-powerpoint',
+		// 			displayName: 'Powerpoint',
+		// 			templateName: 'New presentation.pptx',
+		// 			iconClass: 'icon-powerpoint',
+		// 			fileType: 'file',
+		// 			actionHandler: function (name) {
+		// 				var dir = fileList.getCurrentDirectory();
+		// 				// first create the file
+		// 				fileList.createFile(name).then(function() {
+		// 					// once the file got successfully created,
+		// 					// open the editor
+		// 					var selector = 'tr[data-file="'+ name +'"]';
+		// 					fileList.$container.find(selector).find("span.nametext").click();
+		// 				});
+		// 			}
+		// 		});
+		// 		menu.addMenuEntry({
+		// 			id: 'wopi-new-word',
+		// 			displayName: 'Word',
+		// 			templateName: 'New document.docx',
+		// 			iconClass: 'icon-word',
+		// 			fileType: 'file',
+		// 			actionHandler: function (name) {
+		// 				var dir = fileList.getCurrentDirectory();
+		// 				// first create the file
+		// 				fileList.createFile(name).then(function() {
+		// 					// once the file got successfully created,
+		// 					// open the editor
+		// 					var selector = 'tr[data-file="'+ name +'"]';
+		// 					fileList.$container.find(selector).find("span.nametext").click();
+		// 				});
+		// 			}
+		// 		});
+		// 		menu.addMenuEntry({
+		// 			id: 'wopi-new-excel',
+		// 			displayName: 'Excel',
+		// 			templateName: 'New spreadsheet.xlsx',
+		// 			iconClass: 'icon-excel',
+		// 			fileType: 'file',
+		// 			actionHandler: function (name) {
+		// 				var dir = fileList.getCurrentDirectory();
+		// 				// first create the file
+		// 				fileList.createFile(name).then(function() {
+		// 					// once the file got successfully created,
+		// 					// open the editor
+		// 					var selector = 'tr[data-file="'+ name +'"]';
+		// 					fileList.$container.find(selector).find("span.nametext").click();
+		// 				});
+		// 			}
+		// 		});
+		// 	}
+		// };
+		// OC.Plugins.register('OCA.Files.NewFileMenu', myFileMenuPlugin);
 
+		// !! Do not use MS Office in public links !!
+		// // Doesn't work with IE below 9
+		// if (!$.browser.msie || ($.browser.msie && $.browser.version >= 9)) {
+		// 		if ($('#isPublic').val()) {
+		// 			var sharingToken = $('#sharingToken').val();
+		// 			mime = $('#mimetype').val();
+		// 			switch (mime) {
+		// 				case wordMime:
+		// 					wopiViewer.onViewWordInPublicSingleFile(sharingToken);
+		// 					break;
+		// 				case excelMime: wopiViewer.onViewExcelInPublicSingleFile(sharingToken);
+		// 					break;
+		// 				case powertpointMime:
+		// 					wopiViewer.onViewPowerpointInPublicSingleFile(sharingToken);
+		// 					break;
+		// 			}
+		// 		}
+		// }
 	});
 
 })(jQuery, OC, OCA);
