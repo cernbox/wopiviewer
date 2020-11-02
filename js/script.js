@@ -282,6 +282,12 @@
 			OCA.Files.fileActions.register(excelMime, 'Open in MS Office Online', OC.PERMISSION_READ, OC.imagePath('wopiviewer', 'msoffice_logo.svg'), wopiViewer.onViewExcel);
 		}
 
+		
+		  // disable right click on main file listing ONLY.
+		  $("#filestable").bind("contextmenu", function(e) {
+		    return false;
+		  });
+
 		// !! Do not add MS Office to the "new" button to prevent users from creating files using it !!
 		// var myFileMenuPlugin = {
 		// 	attach: function (menu) {
