@@ -19,7 +19,7 @@ $app = new App('wopiviewer');
 $container = $app->getContainer();
 
 
-$domains = \OC::$server->getConfig()->getSystemValue("cbox.wopi.officeonline", ['https://login.cern.ch', 'https://oos.web.cern.ch', 'https://cbox-wopidev-01.cern.ch:8443', 'https://oos-dev2017.cern.ch/', 'https://msoo-lb-dev.cern.ch']);
+$domains = \OC::$server->getConfig()->getSystemValue("cbox.wopi.officeonline", ['https://login.cern.ch', 'https://oos.web.cern.ch', 'https://cbox-wopidev-01.cern.ch:8443', 'https://oos-dev2017.cern.ch/', 'https://msoo-lb-dev.cern.ch', 'https://wopi.cernbox.cern.ch:8443']);
 $policy = new \OCP\AppFramework\Http\EmptyContentSecurityPolicy();
 foreach($domains as $domain) {
 	$policy->addAllowedScriptDomain($domain);
